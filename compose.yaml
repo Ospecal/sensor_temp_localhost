@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: app
-      POSTGRES_PASSWORD: sensor
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: appdb
     ports:
       - "127.0.0.1:5433:5432"
@@ -24,12 +24,23 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://app:sensor@db:5432/appdb
-      API_TOKEN: replace_with_a_long_random_secret
+      API_TOKEN: ${API_TOKEN}
+      CORS_ORIGINS: ${CORS_ORIGINS}
     ports:
       - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
+
+  simulator:
+    build: ./simulator
+    container_name: sensor-simulator
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:8080/readings
+      API_TOKEN: ${API_TOKEN}
+    depends_on:
+      - api
 
 volumes:
   postgres18_data:
