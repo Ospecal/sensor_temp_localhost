@@ -1,0 +1,19 @@
+Start PostgreSQL and API:
+	
+	docker compose up -d db api
+
+Start simulator:
+	
+	docker compose --profile simulator up -d simulator
+
+Stop only simulator:
+	
+	docker compose --profile simulator stop simulator
+
+Restart simulator:
+
+	docker compose --profile simulator start simulator
+
+Shut everything down:
+
+	docker compose --profile simulator down
