@@ -23,7 +23,7 @@ services:
     container_name: sensor-api
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://app:sensor@db:5432/appdb
+      DATABASE_URL: postgresql://app:${POSTGRES_PASSWORD}@db:5432/appdb
       API_TOKEN: ${API_TOKEN}
       CORS_ORIGINS: ${CORS_ORIGINS}
     ports:
@@ -35,7 +35,9 @@ services:
   simulator:
     build: ./simulator
     container_name: sensor-simulator
-    restart: unless-stopped
+    restart: "no"
+    profiles:
+      - simulator
     environment:
       API_URL: http://api:8080/readings
       API_TOKEN: ${API_TOKEN}
