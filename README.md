@@ -19,42 +19,41 @@ User needs to create a .env file in the same location as the compose.yaml file. 
 Open a terminal in the root directory containing docker-compose.yml.
 ### Step 1 – Build and start the containers
 bash <br>
-To start the container:
+To start the container, this starts PostgreSQL and the API:
 <pre>
-docker compose up -d
+   docker compose up -d db api
 </pre>
-To rebuild and start the container:
+To start the simulator (don't start until you've created a table with DBeaver):
 <pre>
-docker compose up -d --build
+   docker compose --profile simulator up -d simulator
 </pre>
-This command:
 
-    Downloads the PostgreSQL image if necessary.
-    Builds the FastAPI Docker image.
-    Creates the database container.
-    Creates the API container.
-    Starts both services.
-
-To stop the container:
+To stop the simulator, start it again by replacing 'stop' with 'start':
 <pre>
-docker compose down
+   docker compose --profile simulator stop simulator
 </pre>
+
+To shut everything down:
+<pre>
+   docker compose --profile simulator down
+</pre>
+
 to delete containers:
 <pre>
-docker compose down -v
+   docker compose --profile simulator rm -f -s
 </pre>
 ### Step 2 – Check container status
 bash
 <pre>
-docker compose ps
+   docker compose ps
 </pre>
 Both containers should be running.
 ### Step 3 – Check the logs
 bash
 <pre>
-docker compose logs -f
+   docker compose logs -f
 </pre>
-To inspect only the API:
+   To inspect only the API:
 <pre>
 docker compose logs -f api
 </pre>
