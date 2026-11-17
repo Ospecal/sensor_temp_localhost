@@ -5,6 +5,16 @@ A small test environment for storing and retrieving sensor readings using Postgr
 
 The project provides a REST API that allows users to submit sensor readings to a PostgreSQL database and retrieve historical or latest readings.
 
+## .env
+
+User needs to create a .env file in the same location as the compose.yaml file. It should look something like this:
+
+<pre>
+   POSTGRES_PASSWORD=sensor
+    API_TOKEN=replace_with_a_long_random_secret
+    CORS_ORIGINS=http://localhost:3000,http://localhost:5173 
+</pre>
+
 ## Starting the environment:
 Open a terminal in the root directory containing docker-compose.yml.
 ### Step 1 – Build and start the containers
