@@ -105,7 +105,7 @@ def health():
 
 @app.get("/readings", dependencies=[Depends(verify_token)])
 def get_readings(
-    limit: int = Query(default=100, ge=1, le=1000),
+    limit: int = Query(default=1000, ge=1, le=1000),
     offset: int = Query(default=0, ge=0)
 ):
 
