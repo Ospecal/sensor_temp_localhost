@@ -117,6 +117,14 @@ CREATE TABLE IF NOT EXISTS sensor_readings (
     created_at TIMESTAMPTZ not NULL DEFAULT NOW()
 );
 
+ALTER TABLE sensor_readings
+    ADD COLUMN IF NOT EXISTS light_lux DOUBLE PRECISION,
+    ADD COLUMN IF NOT EXISTS pir BOOLEAN,
+    ADD COLUMN IF NOT EXISTS co2_ppm DOUBLE PRECISION,
+    ADD COLUMN IF NOT EXISTS tvoc_ppb DOUBLE PRECISION,
+    ADD COLUMN IF NOT EXISTS pressure_hpa DOUBLE PRECISION,
+    ADD COLUMN IF NOT EXISTS pm25_ugm3 DOUBLE PRECISION,
+    ADD COLUMN IF NOT EXISTS pm10_ugm3 DOUBLE PRECISION;
 
 SELECT * FROM sensor_readings;
 
@@ -142,6 +150,8 @@ VALUES (
 </pre>
 
 Highlight the code you want to run and press 'Ctrl+Enter' to run it <br>
+
+First run CREATE TABLE and then ALTER TABLE (leftover from previous build)
 
 ## Testing the API Using Postman
 
