@@ -64,25 +64,63 @@ def get_connection():
 
 # Data model
 
+# class SensorReading(BaseModel):
+#     sensor_id: str
+#     measured_at: datetime
+#     temperature_c: float | None = None
+#     humidity_pct: float | None = Field(default=None, ge= 0, le = 100)
+#     battery_pct: float | None = Field(default=None, ge= 0, le = 100)
+
 class SensorReading(BaseModel):
-    sensor_id: str
+    model_config = ConfigDict(extra="forbid")
+
+    sensor_id: str = Field(min_length=1, max_length=100)
     measured_at: datetime
+
     temperature_c: float | None = None
-    humidity_pct: float | None = Field(default=None, ge= 0, le = 100)
-    battery_pct: float | None = Field(default=None, ge= 0, le = 100)
+    humidity_pct: float | None = Field(default=None, ge=0, le=100)
+    battery_pct: float | None = Field(default=None, ge=0, le=100)
+
+    light_lux: float | None = Field(default=None, ge=0)
+    pir: bool | None = None
+    co2_ppm: float | None = Field(default=None, ge=0)
+    tvoc_ppb: float | None = Field(default=None, ge=0)
+    pressure_hpa: float | None = Field(default=None, gt=0)
+    pm25_ugm3: float | None = Field(default=None, ge=0)
+    pm10_ugm3: float | None = Field(default=None, ge=0)
+
+
+# class SensorReadingUpdate(BaseModel):
+#     model_config = ConfigDict(extra="forbid")
+
+#     sensor_id: str | None = Field(default=None, min_length=1, max_length=100)
+#     measured_at: datetime | None = None
+#     temperature_c: float | None = None
+#     humidity_pct: float | None = Field(default=None, ge=0, le=100)
+#     battery_pct: float | None = Field(default=None, ge=0, le=100)
 
 class SensorReadingUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     sensor_id: str | None = Field(default=None, min_length=1, max_length=100)
     measured_at: datetime | None = None
+
     temperature_c: float | None = None
     humidity_pct: float | None = Field(default=None, ge=0, le=100)
     battery_pct: float | None = Field(default=None, ge=0, le=100)
 
+    light_lux: float | None = Field(default=None, ge=0)
+    pir: bool | None = None
+    co2_ppm: float | None = Field(default=None, ge=0)
+    tvoc_ppb: float | None = Field(default=None, ge=0)
+    pressure_hpa: float | None = Field(default=None, gt=0)
+    pm25_ugm3: float | None = Field(default=None, ge=0)
+    pm10_ugm3: float | None = Field(default=None, ge=0)
+
+
+
+
 # Health
-
-
 @app.get("/")
 def home():
     return {"message": "Sensor API is running"}
@@ -161,6 +199,31 @@ def get_reading(reading_id: int):
 
 # POST create a reating
 
+# @app.post("/readings", dependencies=[Depends(verify_token)])
+# def create_reading(reading: SensorReading):
+
+#     with get_connection() as conn:
+#         with conn.cursor() as cur:
+#             cur.execute("""
+#                 INSERT INTO sensor_readings (
+#                     sensor_id,
+#                     measured_at,
+#                     temperature_c,
+#                     humidity_pct,
+#                     battery_pct
+#                 )
+#                 VALUES (%s, %s, %s, %s, %s)
+#                 RETURNING *
+#             """, (
+#                 reading.sensor_id,
+#                 reading.measured_at,
+#                 reading.temperature_c,
+#                 reading.humidity_pct,
+#                 reading.battery_pct
+#             ))
+
+#             return cur.fetchone()
+
 @app.post("/readings", dependencies=[Depends(verify_token)])
 def create_reading(reading: SensorReading):
 
@@ -172,21 +235,70 @@ def create_reading(reading: SensorReading):
                     measured_at,
                     temperature_c,
                     humidity_pct,
-                    battery_pct
+                    battery_pct,
+                    light_lux,
+                    pir,
+                    co2_ppm,
+                    tvoc_ppb,
+                    pressure_hpa,
+                    pm25_ugm3,
+                    pm10_ugm3
                 )
-                VALUES (%s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING *
             """, (
                 reading.sensor_id,
                 reading.measured_at,
                 reading.temperature_c,
                 reading.humidity_pct,
-                reading.battery_pct
+                reading.battery_pct,
+                reading.light_lux,
+                reading.pir,
+                reading.co2_ppm,
+                reading.tvoc_ppb,
+                reading.pressure_hpa,
+                reading.pm25_ugm3,
+                reading.pm10_ugm3
             ))
 
             return cur.fetchone()
 
+        
 # PUT, replace a complete reading
+
+# @app.put("/readings/{reading_id}", dependencies=[Depends(verify_token)])
+# def replace_reading(
+#     reading_id: int,
+#     reading: SensorReading
+# ):
+
+#     with get_connection() as conn:
+#         with conn.cursor() as cur:
+#             cur.execute("""
+#                 UPDATE sensor_readings
+#                 SET
+#                     sensor_id = %s,
+#                     measured_at = %s,
+#                     temperature_c = %s,
+#                     humidity_pct = %s,
+#                     battery_pct = %s
+#                 WHERE id = %s
+#                 RETURNING *
+#             """, (
+#                 reading.sensor_id,
+#                 reading.measured_at,
+#                 reading.temperature_c,
+#                 reading.humidity_pct,
+#                 reading.battery_pct,
+#                 reading_id
+#             ))
+
+#             result = cur.fetchone()
+
+#             if result is None:
+#                 raise HTTPException(404, "Reading not found")
+
+#             return result
 
 @app.put("/readings/{reading_id}", dependencies=[Depends(verify_token)])
 def replace_reading(
@@ -203,7 +315,14 @@ def replace_reading(
                     measured_at = %s,
                     temperature_c = %s,
                     humidity_pct = %s,
-                    battery_pct = %s
+                    battery_pct = %s,
+                    light_lux = %s,
+                    pir = %s,
+                    co2_ppm = %s,
+                    tvoc_ppb = %s,
+                    pressure_hpa = %s,
+                    pm25_ugm3 = %s,
+                    pm10_ugm3 = %s
                 WHERE id = %s
                 RETURNING *
             """, (
@@ -212,6 +331,13 @@ def replace_reading(
                 reading.temperature_c,
                 reading.humidity_pct,
                 reading.battery_pct,
+                reading.light_lux,
+                reading.pir,
+                reading.co2_ppm,
+                reading.tvoc_ppb,
+                reading.pressure_hpa,
+                reading.pm25_ugm3,
+                reading.pm10_ugm3,
                 reading_id
             ))
 
@@ -221,6 +347,7 @@ def replace_reading(
                 raise HTTPException(404, "Reading not found")
 
             return result
+        
 
 # PATCH, to uptade selected fields
 
@@ -246,7 +373,14 @@ def update_reading(
         "measured_at",
         "temperature_c",
         "humidity_pct",
-        "battery_pct"
+        "battery_pct",
+        "light_lux",
+        "pir",
+        "co2_ppm",
+        "tvoc_ppb",
+        "pressure_hpa",
+        "pm25_ugm3",
+        "pm10_ugm3"
     }
 
     fields = [field for field in updates if field in allowed_fields]
@@ -273,6 +407,8 @@ def update_reading(
                 raise HTTPException(404, "Reading not found")
 
             return result
+
+
 
 
 # DELETE, delete a reading

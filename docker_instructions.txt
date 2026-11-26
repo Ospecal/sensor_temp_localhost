@@ -6,6 +6,10 @@ Start simulator:
 	
 	docker compose --profile simulator up -d simulator
 
+Start simulator in foreground (cancel with Ctrl+C):
+	
+	docker compose --profile simulator run --rm simulator
+
 Stop only simulator:
 	
 	docker compose --profile simulator stop simulator
